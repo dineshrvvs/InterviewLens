@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InterviewLens</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="card">
+      <div class="drag-handle">
+        <span class="pulse-dot"></span>
+        <span class="title">InterviewLens</span>
+        <button class="btn-settings-gear no-drag" id="btn-settings" title="Settings">⚙</button>
+      </div>
+
+      <div class="status" id="status-line">Overlay ready</div>
+
+      <div class="section-label">Audio Capture</div>
+      <div class="audio-controls">
+        <!-- System Loopback -->
+        <div class="control-group">
+          <div class="control-row">
+            <button class="btn btn-toggle no-drag" id="btn-system">System: OFF</button>
+            <button class="btn btn-action no-drag" id="btn-rec-system">Record 10s</button>
+          </div>
+          <div class="meter-container">
+            <div class="meter-bar"><div class="meter-fill" id="system-meter-fill"></div></div>
+          </div>
+        </div>
+
+        <!-- Microphone -->
+        <div class="control-group">
+          <div class="control-row">
+            <button class="btn btn-toggle no-drag" id="btn-mic">Mic: OFF</button>
+            <button class="btn btn-action no-drag" id="btn-rec-mic">Record 10s</button>
+          </div>
+          <div class="meter-container">
+            <div class="meter-bar"><div class="meter-fill" id="mic-meter-fill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transcript Pane (Phase 2) -->
+      <div class="section-label">Live Transcript <span class="stt-status" id="stt-status">loading model…</span></div>
+      <div class="transcript-pane no-drag" id="transcript-pane">
+        <div class="transcript-entries" id="transcript-entries">
+          <div class="transcript-empty" id="transcript-empty">
+            Enable audio capture to start transcription…
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen Capture (Phase 3) -->
+      <div class="section-label">Screen Capture</div>
+      <div class="screenshot-controls">
+        <div class="control-row">
+          <button class="btn btn-toggle no-drag" id="btn-capture">Capture Screen</button>
+        </div>
+      </div>
+      <div class="screenshot-strip no-drag" id="screenshot-strip">
+        <div class="strip-empty" id="strip-empty">
+          No screenshots captured yet…
+        </div>
+      </div>
+
+      <!-- Copilot Suggestions (Phase 4) -->
+      <div class="section-label">Copilot Response</div>
+      <div class="response-pane no-drag" id="response-pane">
+        <div class="response-header" id="response-header">
+          <span class="response-badge" id="response-badge">Idle</span>
+          <span class="response-spinner" id="response-spinner" style="display:none;"></span>
+        </div>
+        <div class="response-text" id="response-text">
+          Press Ctrl+Enter (Fast) or Ctrl+Shift+Enter (Thinking) to generate suggestions…
+        </div>
+      </div>
+      <div class="llm-actions">
+        <div class="control-row">
+          <button class="btn btn-toggle no-drag" id="btn-fast">Fast Copilot</button>
+          <button class="btn btn-toggle no-drag" id="btn-thinking">Thinking Copilot</button>
+        </div>
+      </div>
+
+      <!-- Ask Copilot (Phase 5) -->
+      <div class="section-label">Ask Copilot</div>
+      <div class="query-container no-drag">
+        <input type="text" id="query-input" class="query-input no-drag" placeholder="Ask a question... (Enter to submit, Esc to blur)" />
+        <button id="query-mode-btn" class="btn btn-mode-toggle btn-mode-fast no-drag">Fast</button>
+      </div>
+
+      <!-- Session Actions (Phase 5) -->
+      <div class="section-label">Session Actions</div>
+      <div class="session-actions no-drag">
+        <div class="control-row">
+          <button class="btn btn-action no-drag" id="btn-clear">Clear Context</button>
+          <button class="btn btn-action no-drag" id="btn-save-session">Save Session</button>
+        </div>
+      </div>
+
+      <div class="section-label">Hotkeys</div>
+      <table class="hotkeys" id="hotkey-table">
+        <tbody>
+          <tr><td class="key">Ctrl + Space</td><td>Ask Copilot (Focus)</td></tr>
+          <tr><td class="key">Esc</td><td>Blur Focus (when active)</td></tr>
+          <tr><td class="key">Ctrl + \</td><td>Toggle overlay</td></tr>
+          <tr><td class="key">Ctrl + Shift + C</td><td>Click-through</td></tr>
+          <tr><td class="key">Ctrl + Shift + S</td><td>Screenshot</td></tr>
+          <tr><td class="key">Ctrl + Enter</td><td>Fast Copilot</td></tr>
+          <tr><td class="key">Ctrl + Shift + Enter</td><td>Thinking Copilot</td></tr>
+          <tr><td class="key">Ctrl + Alt + Arrow</td><td>Nudge position</td></tr>
+          <tr><td class="key">Ctrl + Shift + Q</td><td>Quit</td></tr>
+        </tbody>
+      </table>
+
+      <div class="click-through-indicator" id="click-through-indicator">
+        <span class="indicator-dot" id="ct-dot"></span>
+        <span id="ct-label">Click-through: OFF</span>
+      </div>
+    </div>
+
+    <!-- Settings Drawer (Phase 5) -->
+    <div class="settings-drawer no-drag" id="settings-drawer">
+      <div class="drawer-header">
+        <h3>Settings</h3>
+        <button class="btn-close no-drag" id="btn-settings-close" title="Close Settings">&times;</button>
+      </div>
+      
+      <form id="settings-form" class="no-drag">
+        <div class="form-section">
+          <h4>API Credentials</h4>
+          <div class="form-group">
+            <label for="key-gemini">Gemini API Key</label>
+            <input type="password" id="key-gemini" placeholder="••••••••" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label for="key-groq">Groq API Key</label>
+            <input type="password" id="key-groq" placeholder="••••••••" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label for="key-openrouter">OpenRouter API Key</label>
+            <input type="password" id="key-openrouter" placeholder="••••••••" class="form-input" />
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>Copilot Routing</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="provider-fast">Fast Provider</label>
+              <select id="provider-fast" class="form-select">
+                <option value="groq">Groq</option>
+                <option value="gemini">Gemini</option>
+                <option value="openrouter">OpenRouter</option>
+                <option value="ollama">Ollama (Local)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="model-fast">Fast Model</label>
+              <input type="text" id="model-fast" class="form-input" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="provider-thinking">Thinking Provider</label>
+              <select id="provider-thinking" class="form-select">
+                <option value="groq">Groq</option>
+                <option value="gemini">Gemini</option>
+                <option value="openrouter">OpenRouter</option>
+                <option value="ollama">Ollama (Local)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="model-thinking">Thinking Model</label>
+              <input type="text" id="model-thinking" class="form-input" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ollama-url">Ollama Base URL</label>
+            <input type="text" id="ollama-url" class="form-input" />
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>System Prompts</h4>
+          <div class="form-group">
+            <label for="prompt-fast">Fast Mode Prompt</label>
+            <textarea id="prompt-fast" class="form-textarea" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="prompt-thinking">Thinking Mode Prompt</label>
+            <textarea id="prompt-thinking" class="form-textarea" rows="4"></textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>STT & Screen Settings</h4>
+          <div class="form-group checkbox-row">
+            <input type="checkbox" id="stt-idle-unload" />
+            <label for="stt-idle-unload">Unload STT model when idle</label>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="stt-idle-timeout">Timeout (mins)</label>
+              <input type="number" id="stt-idle-timeout" min="1" max="60" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label for="stt-vad-threshold">VAD Threshold</label>
+              <input type="number" id="stt-vad-threshold" min="0" max="1" step="0.05" class="form-input" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="shot-mode">Capture Display</label>
+              <select id="shot-mode" class="form-select">
+                <option value="primary">Primary Display</option>
+                <option value="all">All Displays</option>
+                <option value="active">Active Window</option>
+              </select>
+            </div>
+            <div class="form-group checkbox-row" style="margin-top: 1.2rem;">
+              <input type="checkbox" id="shot-hide" />
+              <label for="shot-hide">Hide during capture</label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-save no-drag" style="width: 100%; margin-top: 1rem; margin-bottom: 2rem;">Save & Apply Settings</button>
+      </form>
+    </div>
+
+    <script src="./renderer.ts" type="module"></script>
+  </body>
+</html>

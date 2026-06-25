@@ -1,0 +1,9 @@
+overlay/node_modules/
+overlay/out/
+overlay/dist/
+overlay/models/
+overlay/.audio_debug/
+overlay/keys.local.json
+*.local.json
+.DS_Store
+Thumbs.db

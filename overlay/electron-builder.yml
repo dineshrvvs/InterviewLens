@@ -1,0 +1,22 @@
+appId: com.interviewlens.overlay
+productName: InterviewLens
+directories:
+  buildResources: build
+  output: dist
+files:
+  - out/**/*
+asarUnpack:
+  - "**/node_modules/sherpa-onnx-node/**"
+extraResources:
+  - from: models/
+    to: models/
+    filter:
+      - "**/*"
+win:
+  icon: build/icon.ico
+  target:
+    - target: portable
+      arch:
+        - x64
+portable:
+  artifactName: InterviewLens-${version}-portable.exe

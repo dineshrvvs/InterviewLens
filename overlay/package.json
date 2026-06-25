@@ -1,0 +1,25 @@
+{
+  "name": "interview-lens",
+  "version": "0.1.0",
+  "description": "Stealth AI interview assistant overlay — invisible to screen capture",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "build:win": "npm run build && electron-builder --win --x64"
+  },
+  "devDependencies": {
+    "@electron-toolkit/tsconfig": "^1.0.1",
+    "electron": "^35.0.0",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^3.1.0",
+    "typescript": "^5.8.0"
+  },
+  "dependencies": {
+    "@electron-toolkit/preload": "^3.0.1",
+    "@electron-toolkit/utils": "^4.0.0",
+    "openai": "^6.44.0",
+    "sherpa-onnx-node": "^1.13.3"
+  }
+}
